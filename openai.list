@@ -1,7 +1,6 @@
 DOMAIN-SUFFIX,openai.com
 DOMAIN-SUFFIX,auth0.com
 DOMAIN-SUFFIX,sentry.io
-DOMAIN-SUFFIX,google.com
 DOMAIN-SUFFIX,googleapis.com
 DOMAIN-SUFFIX,hcaptcha.com
 DOMAIN-SUFFIX,recaptcha.net
@@ -12,5 +11,4 @@ DOMAIN-SUFFIX,gvt3.com
 DOMAIN-SUFFIX,msftconnecttest.com
 DOMAIN-SUFFIX,live.com
 DOMAIN-SUFFIX,sfx.ms
-DOMAIN-SUFFIX,microsoft.com
 DOMAIN-SUFFIX,oaistatic.com
