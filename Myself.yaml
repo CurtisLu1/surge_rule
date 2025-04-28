@@ -1,0 +1,1385 @@
+# 代理端口配置
+mixed-port: 7890 # HTTP(S) 和 SOCKS 代理混合端口，适合大多数使用场景
+listeners:
+  - name: socks5-in-banwagong
+    type: socks
+    port: 10808 # 假设这是对应 banwagong 的端口
+    tag: banwagong # 添加 tag
+
+  - name: socks5-in-nayun
+    type: socks
+    port: 10809 # 假设这是对应 nayun 的端口
+    tag: nayun # 添加 tag
+
+  - name: socks5-in-cn2-Bage-LA-GPT
+    type: socks
+    port: 10810 # 假设这是对应 cn2-Bage-LA-GPT 的端口
+    tag: cn2-Bage-LA-GPT # 添加 tag
+
+# 局域网连接配置
+allow-lan: true # 允许局域网连接，支持其他设备通过局域网使用代理
+bind-address: "*" # 绑定所有地址，确保局域网设备能够访问
+
+# 进程模式配置
+find-process-mode: strict # 根据代理工具判断进程模式，确保兼容性
+
+# 代理模式
+mode: rule # 规则模式，根据规则决定流量走代理或直连
+
+# TCP Keep Alive 设置
+disable-keep-alive: false # 在 Windows 下会生效；Android 端多数被强制覆盖为 true
+keep-alive-idle: 15
+keep-alive-interval: 15
+
+# 自定义地理数据更新
+geox-url:
+  geoip: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat" # GeoIP 数据文件 URL
+  geosite: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat" # GeoSite 数据文件 URL
+
+geo-auto-update: false # 禁用地理数据自动更新，避免频繁请求浪费资源
+geo-update-interval: 24 # 更新间隔为 24 小时（若启用自动更新）
+
+# 日志配置
+log-level: info # 日志等级为 info，用于日常运行；debug 用于调试
+
+# 网络协议配置
+ipv6: false # 禁用 IPv6，防止 DNS 泄漏和不必要的连接问题
+
+# 性能优化
+unified-delay: true # 使用统一延迟计算方式，便于多节点选择
+tcp-concurrent: true # 开启 TCP 并发连接，提高连接速度
+
+# RESTful API 配置
+external-controller: "0.0.0.0:9090"
+secret: "qqScofield1412"
+external-controller-cors:
+  allow-origins:
+    - "*" # 允许所有来源访问 RESTful API
+  allow-private-network: true # 允许私有网络访问 API
+
+# 外部用户界面配置
+external-ui: /path/to/ui/folder/ # 配置 Web UI 目录，用于访问代理管理界面
+
+profile: #缓存设置(文件位置./cache.db)
+  store-selected: true #节点状态记忆（若不同配置有同代理名称,设置值共享）
+  store-fake-ip: true #fake-ip缓存
+
+sniffer:
+  enable: false
+  force-dns-mapping: true
+  parse-pure-ip: true
+  override-destination: false
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  force-domain:
+    - +.v2ex.com
+  #skip-domain:
+  #  - Mijia Cloud
+  skip-src-address:
+    - 192.168.0.3/32
+  skip-dst-address:
+    - 192.168.0.3/32
+
+tun:
+  enable: false
+  stack: system
+  auto-route: true
+  auto-redirect: true
+  auto-detect-interface: true
+  dns-hijack:
+    - any:53
+    - tcp://any:53
+  device: utun0
+  mtu: 9000
+  strict-route: true
+  gso: true
+  gso-max-size: 65536
+  udp-timeout: 300
+  iproute2-table-index: 2022
+  iproute2-rule-index: 9000
+  endpoint-independent-nat: false
+  route-address-set:
+    - ruleset-1
+  route-exclude-address-set:
+    - ruleset-2
+  route-address:
+    - 0.0.0.0/1
+    - 128.0.0.0/1
+    - "::/1"
+    - "8000::/1"
+  route-exclude-address:
+    - 192.168.0.0/16
+    - fc00::/7
+  include-interface:
+    - eth0
+  exclude-interface:
+    - eth1
+  include-uid:
+    - 0
+  include-uid-range:
+    - 1000:9999
+  exclude-uid:
+    - 1000
+  exclude-uid-range:
+    - 1000:9999
+  include-android-user:
+    - 0
+    - 10
+  include-package:
+    - com.android.chrome
+  exclude-package:
+    - com.android.captiveportallogin
+
+# DNS 配置
+dns:
+  cache-algorithm: arc  # 您可以添加这一行
+  cache-size: 4096      # 增加缓存大小
+  cache-ttl: 3600       # 设置缓存TTL值
+  enable: true
+  listen: 0.0.0.0:53
+  ipv6: false
+  default-nameserver:
+    - 119.29.29.29
+    - 223.5.5.5
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - "*.lan"
+    - localhost.ptlogin2.qq.com
+    - 103.219.195.104
+  nameserver:
+    - 119.29.29.29
+    - 223.5.5.5
+    - 114.114.114.114
+  fallback:
+    - 1.1.1.1
+    - 8.8.8.8
+  direct-nameserver:
+    - 119.29.29.29
+    - 223.5.5.5
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+
+proxies:
+  - name: 韩国_甲骨文1
+    type: trojan
+    server: o1.makeliving.fun
+    port: 16952
+    password: "130310"
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: CjulQ2qVIky7ImIfysgQhNX7s_drGLheCGSkVHcLZhc
+      short-id: 51274895
+    network: tcp
+  - name: 韩国_甲骨文2
+    type: trojan
+    server: o2.makeliving.fun
+    port: 16952
+    password: "130310"
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: 2UW_EO3r7uczPGUUlpJBnMDpDmWUHE2yDzCmXS4sckE
+      short-id: 7563db46
+    network: tcp
+  - name: 韩国_甲骨文_arm
+    type: trojan
+    server: o3.makeliving.fun
+    port: 35930
+    password: "2QZmtdPLfQ"
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: CbcY9qc4YuMDJDyyL0OITlU824TBg1O84ClPy27e2RM
+      short-id: 893fa488
+    network: tcp
+  - name: 🇺🇸瓦工DC99-GPT
+    type: trojan
+    server: 144.34.238.146
+    port: 22339
+    password: "Q26zndI12w"
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: 2UW_EO3r7uczPGUUlpJBnMDpDmWUHE2yDzCmXS4sckE
+      short-id: 1ad8ad1f
+    network: tcp
+  - name: 🇺🇸瓦工DC1-2T-GPT
+    type: trojan
+    server: 144.34.236.73
+    port: 51234
+    password: P8Oeh4SPKL
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: rJFC3dUjJxMnVZiUGzmf_LFsJUwFWY-CU5RQgFOHCWM
+      short-id: 4147dace
+    network: tcp
+  - name: 🇺🇸lightlayer-cmi-GPT
+    type: ss
+    server: 38.61.29.73
+    port: 51234
+    cipher: aes-256-gcm
+    password: MW1adGI4WXo2R2JpTjFzZDRjaldHUU5oNTBmeXU3eENreVd0UDJwanNlTmdSSW5oeFh1N2cxZXFncGc5N08xNQ==
+    udp: true
+    dialer-proxy: US-SMART
+  - name: 🇺🇸Zgo-LA-GPT
+    type: ss
+    server: 23.159.248.161
+    port: 51234
+    cipher: aes-256-gcm
+    password: b09ZQlJudzNyUjRtT0ptaE85UFFTM3g3b1lBTDF1UUJLZVY3MjREaHRYTWMwc0FjWkh0ellsb1hSWHd4MDhFRQ==
+    udp: true
+    dialer-proxy: US-SMART
+  - name: 🇺🇸DMIT-GIACN2-GPT
+    type: trojan
+    server: 154.26.183.135
+    port: 51234
+    password: "VtPDzH2Ti7"
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: VigpKFbSLnHLzBWobZaS1IBmw--giJ51w92y723ajnU
+      short-id: 767304d7
+    network: tcp
+  - name: 🇺🇸Back-9929-GPT
+    type: trojan
+    server: 23.130.4.216
+    port: 51234
+    password: "5DhoQB6zsr"
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: mzevpYbS8kXengBY5p7tt56QE4tS3lwlwRemmkcQeyc
+      short-id: 7fbaaf8f
+    network: tcp
+  - name: 🇯🇵yxvm-MJ-GPT
+    type: trojan
+    server: 46.3.100.94
+    port: 32544
+    password: "ASnYijvGZM"
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: O9RSr5gSdok2K_tobQnf_scyKVqnCx6C4Jrl7_rCZEQ
+      short-id: 9c96da12
+    network: tcp
+  - name: 🇯🇵yxvm5刀-MJ-GPT
+    type: trojan
+    server: 46.3.101.51
+    port: 28719
+    password: "mOKUkhYGV0"
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: PGG2EYOvsFt2lAQTD7lqHeRxz2KxvllEDKcUrtizPBU
+      short-id: 6d059548
+    network: tcp
+  - name: 🇯🇵RFC-IJJ-GPT
+    type: trojan
+    server: 23.249.16.145
+    port: 51234
+    password: "xAOoCCVt6G"
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: VcqHivYGGoBkcxOI6cSSjQmneltstkb2OhvO53dyhEM
+      short-id: 344cbbf0
+    network: tcp
+  - name: 🇯🇵Claw-SB-GPT
+    type: trojan
+    server: 47.79.34.10
+    port: 51234
+    password: "EeZ83Lw2LW"
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: VigpKFbSLnHLzBWobZaS1IBmw--giJ51w92y723ajnU
+      short-id: 420863d5
+    network: tcp
+  - name: 🇯🇵RFC-FCC-GPT-MJ
+    type: ss
+    server: 115.231.29.253
+    port: 10061
+    cipher: aes-256-gcm
+    password: RXo4UjA0ckxPMnlOTEVXZFBUN1c1VXE1V0M4Q1N6UVJaV1NwenBJUDFESEpOMDR3MVFsMlF4ck10Sk9NVUFrdA==
+    udp: false
+  - name: 🇭🇰IX-Alice-GPT
+    type: trojan
+    server: 8.134.188.185
+    port: 51112
+    password: xQbZOwEbQW
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: VigpKFbSLnHLzBWobZaS1IBmw--giJ51w92y723ajnU
+      short-id: a9a00a2e
+    network: tcp
+  - name: 🇭🇰IX-HGC-GPT
+    type: ss
+    server: 8.134.188.185
+    port: 51112
+    cipher: aes-256-gcm
+    password: UzVIcVdCeHBITEp5dUhXeENGckRYYzBTdmZKRWR3OU8xTXlpUEF0dGlLZWxDNHZTelRGV3ZQZVJFSzkyN2VOcA==
+    udp: true
+  - name: 🇭🇰Claw-HK-4.2
+    type: trojan
+    server: 8.217.128.148
+    port: 51234
+    password: "h61ysvFZB9"
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: rJFC3dUjJxMnVZiUGzmf_LFsJUwFWY-CU5RQgFOHCWM
+      short-id: 3ef1fa38
+    network: tcp
+  - name: 🇭🇰CMHK|2T-CN2-GPT
+    type: trojan
+    server: cmhk.makeliving.fun
+    port: 50751
+    password: kVTAq7OaiA
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: d9cGLVBrDFS02L2OvkqyqwFZ1Ux3AHs28ehl4Rwiyl0
+      short-id: a4fffc91
+    network: tcp
+  - name: 🇭🇰HK85-cmi-GPT
+    type: trojan
+    server: 45.78.26.179
+    port: 51234
+    password: BACTMp1nI9
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: mzevpYbS8kXengBY5p7tt56QE4tS3lwlwRemmkcQeyc
+      short-id: 38387b80
+    network: tcp
+  - name: 🇭🇰ISIF-CUG4837-GPT
+    type: trojan
+    server: 46.232.106.11
+    port: 51234
+    password: AoHTJe3sQb
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: HYyIGuyNFslmcnNT7mrDdmuXwn4cm7smE_FZbYguKHQ
+      short-id: 309f3ee7
+    network: tcp
+  - name: 🇭🇰Alice-300M-GPT
+    type: ss
+    server: 5.102.125.199
+    port: 51234
+    cipher: aes-256-gcm
+    password: d0hXbEo5cFZjaWNoZTBUOFlEd3NiTUJLUkV6ZHoyT0EyVGhTRUlMc2NOa0pjUWplTmpuaWhFQXBsUHdVNkFIVw==
+    udp: true
+    dialer-proxy: HK-SMART
+  - name: 🇭🇰YxVM-FREE-GPT
+    type: ss
+    server: 46.232.60.48
+    port: 51234
+    cipher: aes-256-gcm
+    password: MnZnRFl5cWJNZkRXQkdCR1pjanRDVkEzYWpEeUFFZjl0TVlHTUM5NDdRZm9CcVk2RDc2U0VBSVdQVGxOYXQ0RQ==
+    udp: true
+    dialer-proxy: HK-SMART
+  - name: 🇭🇰Wuyou_CMIN2-GPT
+    type: trojan
+    server: 103.192.179.221
+    port: 51234
+    password: QGOw8OMmwo
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: d9cGLVBrDFS02L2OvkqyqwFZ1Ux3AHs28ehl4Rwiyl0
+      short-id: 1fa08a5e
+    network: tcp
+  - name: 🇭🇰BAGE-HKL
+    type: ss
+    server: 103.219.195.104
+    port: 51234
+    cipher: aes-256-gcm
+    password: OXhyOW1jaTRJNlVFcTNtQWozWFNrSXlGY09FZVhsV3JhUHVHQjlsc004eTdUWFpWVmRQdEhYQTh3VDlhOXg0ag==
+    udp: true
+    dialer-proxy: HK-SMART
+  - name: 🇭🇰BAGE-HKS
+    type: ss
+    server: 213.218.255.44
+    port: 51234
+    cipher: aes-256-gcm
+    password: elFRNTVnT1ZPa0NJaXd4U2VaY2FqS3BWdTFYUURWaGlKRWpEYkFPcnl3OG5rc09LNlM4QXhTUzVxdDdRYW45cQ==
+    udp: true
+    dialer-proxy: HK-SMART
+  - name: 🇭🇰BestVM|HKS|GPT
+    type: ss
+    server: 103.49.61.214
+    port: 51234
+    cipher: aes-256-gcm
+    password: Y1YwNlA1ZHpJbzFqSVBBOENCM2lhQXhlb2FkbFg4V1cxU3lPSWpqUHd1RG5uUGpOV0FUZGhvR3owU3I0YUZ4aQ==
+    udp: true
+    dialer-proxy: HK-SMART
+  - name: 🇸🇬Legend-FREE-GPT
+    type: ss
+    server: 77.93.91.199
+    port: 51234
+    cipher: aes-256-gcm
+    password: a2NCN29tdEZQeTl3b01vbU8wWkRXemdCM2VVOGd5bXkybGFFdHZKSzEzZmlPMG9ScWFIRGs2bm5pZkdxelpkOA==
+    udp: true
+    dialer-proxy: HK-SMART
+  - name: 🇸🇬Lain-BGP-GPT
+    type: ss
+    server: 46.203.98.85
+    port: 51234
+    cipher: aes-256-gcm
+    password: WVd5czJiVU92S0RwWnVlZWlBT2xPdXplbWFqT0Y5cThocldybWNrblViZ2RBSHEyelE2c2FpR3RtdlZRWW5FRA==
+    udp: true
+    dialer-proxy: HK-SMART
+  - name: 🇸🇬RFC-T1-GPT
+    type: ss
+    server: 23.249.27.193
+    port: 51234
+    cipher: aes-256-gcm
+    password: SjdSVUl4ZmdGaXFTUWVoZVRaa01Wb0JsSmVValdHdTBhM1JsNnJDc1FoRG1wZmExY2VwQ0c3NEhnczNCS3VKUg==
+    udp: true
+    dialer-proxy: HK-SMART
+  - name: 🇸🇬Sharon01-CN2-GPT
+    type: trojan
+    server: 172.99.138.13
+    port: 51234
+    password: VEOpWZNMCz
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: HYyIGuyNFslmcnNT7mrDdmuXwn4cm7smE_FZbYguKHQ
+      short-id: 7734b8de
+    network: tcp
+  - name: 🇸🇬Sharon02-CN2-GPT
+    type: trojan
+    server: 172.99.138.15
+    port: 51234
+    password: qlno2Nd7gb
+    udp: true
+    sni: icloud.com
+    client-fingerprint: random
+    skip-cert-verify: false
+    reality-opts:
+      public-key: goY3OtfaA4UYbiz7Hn0NysI5QJrK0VT_Chg6RLgUPQU
+      short-id: 1d3eee20
+    network: tcp
+  - {
+      "name": "阿里上海sock5",
+      "type": "socks5",
+      "server": "ali.makeliving.fun",
+      "port": 10081,
+      "username": "lufusheng",
+      "password": "130310",
+      "url": 'http://connectivitycheck.platform.hicloud.com/generate_204'
+    }
+  - {
+      "name": "上海sock5",
+      "type": "socks5",
+      "server": "101.132.152.253",
+      "port": 20081,
+      "username": "lufusheng",
+      "password": "130310",
+      "url": 'http://connectivitycheck.platform.hicloud.com/generate_204'
+    }
+  - {
+      "name": "广州sock5",
+      "type": "socks5",
+      "server": "8.134.188.185",
+      "port": 20081,
+      "username": "lufusheng",
+      "password": "130310",
+      "url": 'http://connectivitycheck.platform.hicloud.com/generate_204'
+    }
+  - {
+      "name": "家sock5",
+      "type": "socks5",
+      "server": "jia.makeliving.fun",
+      "port": 10082,
+      "username": "lufusheng",
+      "password": "130310",
+      "url": 'http://connectivitycheck.platform.hicloud.com/generate_204'
+    }
+  - {
+      "name": "公司sock5",
+      "type": "socks5",
+      "server": "gongsi.makeliving.fun",
+      "port": 10081,
+      "username": "lufusheng",
+      "password": "130310",
+      "url": 'http://connectivitycheck.platform.hicloud.com/generate_204'
+    }
+  - {
+      "name": "杨曙家sock5",
+      "type": "socks5",
+      "server": "yangshu.makeliving.fun",
+      "port": 10081,
+      "username": "lufusheng",
+      "password": "130310",
+      "url": 'http://connectivitycheck.platform.hicloud.com/generate_204'
+    }
+  - {
+      "name": "阿里上海http",
+      "type": "http",
+      "server": "ali.makeliving.fun",
+      "port": 10080,
+      "username": "lufusheng",
+      "password": "130310",
+      "url": 'http://connectivitycheck.platform.hicloud.com/generate_204'
+    }
+  - {
+      "name": "🇸🇬Singapore|GPT",
+      "type": "trojan",
+      "server": "singapore.heyhoon.com",
+      "port": 11111,
+      "password": "49645754-849b-4989-a0bd-dc83b041249a",
+      "udp": true,
+      "sni": "singapore.heyhoon.com",
+    }
+  - {
+      "name": "🇭🇰Hongkong",
+      "type": "trojan",
+      "server": "hongkong.heyhoon.com",
+      "port": 11111,
+      "password": "49645754-849b-4989-a0bd-dc83b041249a",
+      "udp": true,
+      "sni": "hongkong.heyhoon.com",
+    }
+  - {
+      "name": "🇯🇵Tokyo|GPT",
+      "type": "trojan",
+      "server": "tokyo.heyhoon.com",
+      "port": 11111,
+      "password": "49645754-849b-4989-a0bd-dc83b041249a",
+      "udp": true,
+      "sni": "tokyo.heyhoon.com",
+    }
+  - {
+      "name": "🇯🇵Osaka|GPT",
+      "type": "trojan",
+      "server": "osaka.heyhoon.com",
+      "port": 11111,
+      "password": "49645754-849b-4989-a0bd-dc83b041249a",
+      "udp": true,
+      "sni": "osaka.heyhoon.com",
+    }
+  - {
+      "name": "🇰🇷Seoul|GPT",
+      "type": "trojan",
+      "server": "seoul.heyhoon.com",
+      "port": 11111,
+      "password": "49645754-849b-4989-a0bd-dc83b041249a",
+      "udp": true,
+      "sni": "seoul.heyhoon.com",
+    }
+  - {
+      "name": "🇰🇷Busan|GPT",
+      "type": "trojan",
+      "server": "busan.heyhoon.com",
+      "port": 11111,
+      "password": "49645754-849b-4989-a0bd-dc83b041249a",
+      "udp": true,
+      "sni": "busan.heyhoon.com",
+    }
+
+proxy-providers:
+  xz:
+    type: http
+    path: ./profiles/proxies/xz.yaml
+    url: "https://xz.netcafe.cc/api/v1/client/subscribe?token=491d22106c0f06ef024142fcb5fbf636"
+    interval: 3600
+    health-check:
+      enable: true
+      url: http://cp.cloudflare.com/generate_204
+      interval: 600
+  vv:
+    type: http
+    path: ./profiles/proxies/vv.yaml
+    url: "https://sub.wtf.day/link/EiMDhqYbpmCWS6lQ?clash=1"
+    interval: 3600
+    health-check:
+      enable: true
+      url: http://cp.cloudflare.com/generate_204
+      interval: 300
+
+proxy-groups:
+  - name: China-socks5
+    type: select
+    proxies:
+    - 阿里上海sock5
+    - 上海sock5
+    - 广州sock5
+    - 家sock5
+    - 公司sock5
+    - 杨曙家sock5
+    url: 'http://connectivitycheck.platform.hicloud.com/generate_204'
+    interval: 300
+    hidden: true
+  - name: HK-SMART
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Country/HK02.png
+    type: url-test
+    proxies:
+    - 🇭🇰Claw-HK-4.2
+    - 🇭🇰IX-Alice-GPT
+    - 🇭🇰HK85-cmi-GPT
+    - 🇭🇰ISIF-CUG4837-GPT
+    - 🇭🇰Wuyou_CMIN2-GPT
+    url: 'http://cp.cloudflare.com/generate_204'
+    interval: 300
+    filter: "K|香港|港|🇭🇰|Hongkong|HK"
+    hidden: true
+  - name: SG-SMART
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Country/SG.png
+    type: url-test
+    proxies:
+    - 🇸🇬Sharon01-CN2-GPT
+    - 🇸🇬Sharon02-CN2-GPT
+    - 🇸🇬Singapore|GPT
+    url: 'http://cp.cloudflare.com/generate_204'
+    interval: 300
+    filter: 狮城|新|新加坡|🇸🇬|SG
+    hidden: true
+  - name: US-SMART
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Country/US.png
+    type: url-test
+    proxies:
+    - 🇺🇸DMIT-GIACN2-GPT
+    - 🇺🇸瓦工DC99-GPT
+    - 🇺🇸瓦工DC1-2T-GPT
+    - 🇺🇸Back-9929-GPT
+    url: 'http://cp.cloudflare.com/generate_204'
+    interval: 300
+    filter: 美|美国|🇺🇸|US|us
+    hidden: true
+  - name: JP-SMART
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Country/JP.png
+    type: url-test
+    proxies:
+    - 🇯🇵yxvm-MJ-GPT
+    - 🇯🇵yxvm5刀-MJ-GPT
+    - 🇯🇵RFC-IJJ-GPT
+    - 🇯🇵Claw-SB-GPT
+    - 🇯🇵RFC-FCC-GPT-MJ
+    url: 'http://cp.cloudflare.com/generate_204'
+    interval: 300
+    filter: 日|日本|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|JP|Japan
+    hidden: true
+  - name: 🚀MySelf
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Proxy.png
+    type: select
+    include-all-proxies: true
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 300
+    lazy: true
+  - name: PROXY
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Proxy.png
+    type: select
+    use:
+      - xz
+      - vv
+    include-all-proxies: true
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 300
+    lazy: true
+  - name: OpenAI
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/OpenAI.png
+    type: select
+    filter: GPT
+    use:
+      - xz
+      - vv
+    include-all-proxies: true
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 300
+    lazy: true
+  - name: Claude
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/AmyTelecom.png
+    type: select
+    filter: GPT
+    use:
+      - xz
+      - vv
+    include-all-proxies: true
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 300
+    lazy: true
+  - name: Gemini
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google_Opinion_Rewards.png
+    type: select
+    filter: GPT
+    use:
+      - xz
+      - vv
+    include-all-proxies: true
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 300
+    lazy: true
+  - name: MJ
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Luffy.png
+    type: select
+    filter: MJ
+    include-all-proxies: true
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 300
+    lazy: true
+  - name: US
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Country/US.png
+    type: select
+    filter: 美|美国|🇺🇸|US|us
+    use:
+      - xz
+      - vv
+    include-all-proxies: true
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 300
+    lazy: true
+  - name: HK
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Country/HK02.png
+    type: select
+    filter: K|香港|港|🇭🇰|Hongkong|HK
+    use:
+      - xz
+      - vv
+    include-all-proxies: true
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 300
+    lazy: true
+  - name: TW
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Country/TW.png
+    type: select
+    filter: 台|台湾|TW
+    use:
+      - xz
+      - vv
+    include-all-proxies: true
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 300
+    lazy: true
+  - name: JP
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Country/JP.png
+    type: select
+    filter: 日|日本|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|JP|Japan
+    use:
+      - xz
+      - vv
+    include-all-proxies: true
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 300
+    lazy: true
+  - name: SG
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Country/SG.png
+    type: select
+    filter: 狮城|新|新加坡|🇸🇬|SG
+    use:
+      - xz
+      - vv
+    include-all-proxies: true
+    url: "http://cp.cloudflare.com/generate_204"
+    interval: 300
+    lazy: true
+  - name: Global
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/World_Map.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: GlobalMedia
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ForeignMedia.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Netflix
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Netflix.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Disney+
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Disney+.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: HBO
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/HBO.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: YouTube
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Youtube.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Spotify
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Spotify.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: TikTok
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Tiktok.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Bilibili
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Bilibili.png
+    type: select
+    proxies:
+      - DIRECT
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Telegram
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Telegram.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Twitter
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Twitter.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Speedtest
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Proxy.png
+    type: select
+    proxies:
+      - DIRECT
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - 🚀MySelf
+      - FINAL
+  - name: PayPal
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Paypal.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: TestFlight
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/TestFlight.png
+    type: select
+    proxies:
+      - DIRECT
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Apple
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Apple.png
+    type: select
+    proxies:
+      - DIRECT
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Google
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Google.png
+    type: select
+    proxies:
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Microsoft
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Microsoft.png
+    type: select
+    proxies:
+      - DIRECT
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Weibo
+    icon: https://raw.githubusercontent.com/erdongchanyo/icon/main/Policy-Filter/Weibo.png
+    type: select
+    proxies:
+      - DIRECT
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+      - FINAL
+  - name: Mainland
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/CN.png
+    type: select
+    proxies:
+      - DIRECT
+      - FINAL
+  - name: FINAL
+    icon: https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png
+    type: select
+    proxies:
+      - DIRECT
+      - PROXY
+      - US
+      - HK
+      - TW
+      - JP
+      - SG
+  - name: Advertising
+    type: select
+    proxies:
+      - REJECT
+      - DIRECT
+    hidden: false
+    alert: no
+    all_proxies: no
+
+rule-providers:
+  Advertising:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Advertising/Advertising.yaml
+    interval: 86400
+    path: ./ruleset/Advertising.yaml
+  Privacy_Domain:
+    behavior: domain
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Privacy/Privacy_Domain.yaml
+    interval: 86400
+    path: ./ruleset/Privacy_Domain.yaml
+  Hijacking:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Hijacking/Hijacking.yaml
+    interval: 86400
+    path: ./ruleset/Hijacking.yaml
+  Netflix:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Netflix/Netflix.yaml
+    interval: 86400
+    path: ./ruleset/Netflix.yaml
+  Disney:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Disney/Disney.yaml
+    interval: 86400
+    path: ./ruleset/Disney.yaml
+  HBO:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/HBO/HBO.yaml
+    interval: 86400
+    path: ./ruleset/HBO.yaml
+  YouTube:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/YouTube/YouTube.yaml
+    interval: 86400
+    path: ./ruleset/YouTube.yaml
+  Spotify:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Spotify/Spotify.yaml
+    interval: 86400
+    path: ./ruleset/Spotify.yaml
+  TikTok:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/TikTok/TikTok.yaml
+    interval: 86400
+    path: ./ruleset/TikTok.yaml
+  GlobalMedia:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GlobalMedia/GlobalMedia.yaml
+    interval: 86400
+    path: ./ruleset/GlobalMedia.yaml
+  BiliBili:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/BiliBili/BiliBili.yaml
+    interval: 86400
+    path: ./ruleset/BiliBili.yaml
+  Twitter:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Twitter/Twitter.yaml
+    interval: 86400
+    path: ./ruleset/Twitter.yaml
+  Speedtest:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Speedtest/Speedtest.yaml
+    interval: 86400
+    path: ./ruleset/Speedtest.yaml
+  PayPal:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/PayPal/PayPal.yaml
+    interval: 86400
+    path: ./ruleset/PayPal.yaml
+  Telegram:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Telegram/Telegram.yaml
+    interval: 86400
+    path: ./ruleset/Telegram.yaml
+  TestFlight:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/TestFlight/TestFlight.yaml
+    interval: 86400
+    path: ./ruleset/TestFlight.yaml
+  Apple:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Apple/Apple.yaml
+    interval: 86400
+    path: ./ruleset/Apple.yaml
+  Google:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Google/Google.yaml
+    interval: 86400
+    path: ./ruleset/Google.yaml
+  Microsoft:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Microsoft/Microsoft.yaml
+    interval: 86400
+    path: ./ruleset/Microsoft.yaml
+  Weibo:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Weibo/Weibo.yaml
+    interval: 86400
+    path: ./ruleset/Weibo.yaml
+  China:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/China/China.yaml
+    interval: 86400
+    path: ./ruleset/China.yaml
+  Claude:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Claude/Claude.yaml
+    interval: 86400
+    path: ./ruleset/Claude.yaml
+  Google_Gemini:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Gemini/Gemini.yaml
+    interval: 86400
+    path: ./ruleset/Gemini.yaml
+  OpenAI:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OpenAI/OpenAI.yaml
+    interval: 86400
+    path: ./ruleset/OpenAI.yaml
+  Github:
+    behavior: classical
+    type: http
+    url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/GitHub/GitHub.yaml
+    interval: 86400
+    path: ./ruleset/GitHub.yaml
+
+rules:
+  # Bitbrowser
+  - IN-PORT,10808, 🇺🇸瓦工DC99-GPT
+  - IN-PORT,10809, 🇺🇸Zgo-LA-GPT
+  - IN-PORT,10810, 🇺🇸lightlayer-cmi-GPT
+  # Emby
+  - DOMAIN-SUFFIX,vfing.de,🇭🇰YxVM-FREE-GPT
+  - DOMAIN-SUFFIX,zox.show,US-SMART
+  - DOMAIN-SUFFIX,beebi.org,US-SMART
+  - DOMAIN-SUFFIX,coemn.com,US-SMART
+  - DOMAIN-SUFFIX,charontv.com, US
+  - DOMAIN-SUFFIX,makima.online, DIRECT
+  - DOMAIN-SUFFIX,mobaiemby.site,US-SMART
+  - DOMAIN-SUFFIX,carryz.net,🇯🇵RFC-IJJ-GPT
+  - DOMAIN-SUFFIX,mefun.org,US-SMART
+  - DOMAIN-SUFFIX,mefun.vip,DIRECT
+  - DOMAIN-SUFFIX,embymv.link,DIRECT
+  - DOMAIN-SUFFIX,xmsl.org,US-SMART
+  - IP-SUFFIX,167.235.118.41/24,PROXY
+
+  # win下 microsoft
+  - DOMAIN-SUFFIX,login.microsoft.com,🇭🇰Alice-300M-GPT
+  - DOMAIN-SUFFIX,onedrive.live.com,🇭🇰Alice-300M-GPT
+  - DOMAIN-SUFFIX,onedrive.com,🇭🇰Alice-300M-GPT
+  # OPENAI
+  - DOMAIN-SUFFIX,sora.com,OpenAI
+  - DOMAIN-SUFFIX,steamcontent.com,DIRECT
+  - DOMAIN-SUFFIX,openai.com,OpenAI
+  - DOMAIN-SUFFIX,auth0.com,OpenAI
+  - DOMAIN-SUFFIX,sentry.io,OpenAI
+  - DOMAIN-SUFFIX,gstatic.com,OpenAI
+  - DOMAIN-SUFFIX,openai.com,OpenAI
+  - DOMAIN-SUFFIX,auth0.com,OpenAI
+  - DOMAIN-SUFFIX,sentry.io,OpenAI
+  - DOMAIN-SUFFIX,hcaptcha.com,OpenAI
+  - DOMAIN-SUFFIX,recaptcha.net,OpenAI
+  - DOMAIN-SUFFIX,gvt2.com,OpenAI
+  - DOMAIN-SUFFIX,gvt1.com,OpenAI
+  - DOMAIN-SUFFIX,gvt3.com,OpenAI
+  - DOMAIN-SUFFIX,msftconnecttest.com,OpenAI
+  - DOMAIN-SUFFIX,live.com,OpenAI
+  - DOMAIN-SUFFIX,sfx.ms,OpenAI
+  - DOMAIN-SUFFIX,oaistatic.com,OpenAI
+  - DOMAIN-SUFFIX,oaiusercontent.com,OpenAI
+  - DOMAIN,browser-intake-doghq.com,OpenAI
+  - DOMAIN,static.cloudflareinsights.com,OpenAI
+  - DOMAIN-SUFFIX,ai.com,OpenAI
+  - DOMAIN-SUFFIX,algolia.net,OpenAI
+  - DOMAIN-SUFFIX,api.statsig.com,OpenAI
+  - DOMAIN-SUFFIX,cdn.cloudflare.net,OpenAI
+  - DOMAIN-SUFFIX,challenges.cloudflare.com,OpenAI
+  - DOMAIN-SUFFIX,chatgpt.livekit.cloud,OpenAI
+  - DOMAIN-SUFFIX,client-api.arkoselabs.com,OpenAI
+  - DOMAIN-SUFFIX,events.statsigapi.net,OpenAI
+  - DOMAIN-SUFFIX,featuregates.org,OpenAI
+  - DOMAIN-SUFFIX,host.livekit.cloud,OpenAI
+  - DOMAIN-SUFFIX,identrust.com,OpenAI
+  - DOMAIN-SUFFIX,intercom.io,OpenAI
+  - DOMAIN-SUFFIX,intercomcdn.com,OpenAI
+  - DOMAIN-SUFFIX,launchdarkly.com,OpenAI
+  - DOMAIN-SUFFIX,observeit.net,OpenAI
+  - DOMAIN-SUFFIX,poe.com,OpenAI
+  - DOMAIN-SUFFIX,segment.io,OpenAI
+  - DOMAIN-SUFFIX,stripe.com,OpenAI
+  - DOMAIN-SUFFIX,turn.livekit.cloud,OpenAI
+  - DOMAIN-KEYWORD,openai,OpenAI
+  - DOMAIN-KEYWORD,openai,OpenAI
+  - DOMAIN-SUFFIX,ciciai.com,OpenAI
+  - DOMAIN-SUFFIX,chatgpt.com,OpenAI
+  # 自定义
+  - DOMAIN-SUFFIX, lala.gg, HK
+  - DOMAIN-SUFFIX, baimiaoapp.com, DIRECT
+  - DOMAIN-SUFFIX, abcd7.top, PROXY
+  - DOMAIN-SUFFIX, cityline.com.hk, HK
+  - DOMAIN-SUFFIX, boluomi.link, PROXY
+  - DOMAIN-SUFFIX, xxxh.de, PROXY
+  - DOMAIN-SUFFIX,jike.info, HK
+  - DOMAIN-SUFFIX, perplexity.ai, 🇸🇬Lain-BGP-GPT
+  - DOMAIN-SUFFIX, limbopro.com, PROXY
+  - DOMAIN-SUFFIX, rfchost.com, DIRECT
+  - DOMAIN-SUFFIX, akile.io, HK
+  - DOMAIN-SUFFIX, nodeloc.com, PROXY
+  - DOMAIN-SUFFIX, isif.net, PROXY
+  - DOMAIN,clash.razord.top,DIRECT
+  - DOMAIN,yacd.haishan.me,DIRECT
+  - DOMAIN,ocsp.apple.com,DIRECT
+  - DOMAIN-SUFFIX,snssdk.com,DIRECT
+  - DOMAIN-SUFFIX,amemv.com,DIRECT
+  - DOMAIN-SUFFIX,local,DIRECT
+  - DOMAIN-SUFFIX,fmta.boo,JP
+  - DOMAIN-SUFFIX,linux.do, 阿里上海http
+  - PROCESS-NAME, parsecd.exe, DIRECT
+  - DOMAIN-SUFFIX,parsecd.app, PROXY
+  - PROCESS-NAME, claude.exe, Claude
+  - PROCESS-NAME, ChatGPT.exe, OpenAI
+  - DOMAIN-SUFFIX, mongodb.com,PROXY
+  - DOMAIN-SUFFIX, gigsgigscloud.com, PROXY
+  - DOMAIN-SUFFIX,nodeseek.com,PROXY
+  - PROCESS-NAME, Journey Desktop 2025.exe, PROXY
+  - DOMAIN-SUFFIX,xiaohongshu.com,DIRECT
+  - DOMAIN-SUFFIX,skrskr.link,DIRECT
+  - PROCESS-NAME,Code.exe,Claude
+  - PROCESS-NAME,lx-music-desktop.exe,DIRECT
+  - PROCESS-NAME,Feishu.exe,DIRECT
+  - DOMAIN-SUFFIX,v2ex.com,HK
+  - PROCESS-NAME,steam.exe,DIRECT
+  - DOMAIN-SUFFIX,anthropic.com,OpenAI
+  - DOMAIN-SUFFIX,claude.ai,Claude
+  - PROCESS-NAME,TTime.exe,DIRECT
+  - PROCESS-NAME,Termius.exe,DIRECT
+  - DOMAIN-SUFFIX,acctcdn.msftauth.net,HK
+  - DOMAIN-SUFFIX,api.onedrive.com,HK
+  - DOMAIN-SUFFIX,789.123456.al,PROXY
+  - DOMAIN-SUFFIX,ju.dog,PROXY
+  - DOMAIN-SUFFIX,link.com,US
+  - DOMAIN-SUFFIX,californiacolleges.edu,US
+  - DOMAIN-SUFFIX,cccat.io,DIRECT
+  - DOMAIN-SUFFIX,termius.com,DIRECT
+  - DOMAIN-SUFFIX,lakemichigancollege.edu,HK
+  - DOMAIN-SUFFIX,live.com,HK
+  - DOMAIN-SUFFIX,canva.com,HK
+  - PROCESS-NAME,OneDrive,HK
+  - DOMAIN-SUFFIX,qidian.com,DIRECT
+  - DOMAIN-SUFFIX,apkpure.com,HK
+  - DOMAIN-SUFFIX,36kr.com,DIRECT
+  - DOMAIN-SUFFIX,xiaoeknow.com,DIRECT
+  - DOMAIN-SUFFIX,douban.com,DIRECT
+  - DOMAIN-SUFFIX,xiaohongshu.com,DIRECT
+  - DOMAIN-SUFFIX,icloud.com.cn,DIRECT
+  - DOMAIN-SUFFIX,icloud.com,DIRECT
+  - DOMAIN-SUFFIX,bing.com,JP
+  - DOMAIN-SUFFIX,xiaoeknow.com,DIRECT
+  - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,zsxq.com,DIRECT
+  - DOMAIN-SUFFIX,recloud.pw,HK
+  - DOMAIN-SUFFIX,oneprovider.com,PROXY
+  - DOMAIN-SUFFIX,cloudiplc.com,HK
+  - DOMAIN-SUFFIX,huaban.com,DIRECT
+  - DOMAIN-SUFFIX,gaoding.com,DIRECT
+  - DOMAIN-SUFFIX,skinny.co.nz,HK
+  - DOMAIN-SUFFIX,jd.com,DIRECT
+  - DOMAIN-SUFFIX,yzcsoft.com,DIRECT
+  - DOMAIN-SUFFIX,bytedance.com,DIRECT
+  - DOMAIN-SUFFIX,1688.com,DIRECT
+  - DOMAIN-SUFFIX,npmjs.com,PROXY
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,nike.com.cn,DIRECT
+  - DOMAIN-SUFFIX,discord.com,MJ
+  - DOMAIN-SUFFIX,midjourney.com,MJ
+  # 其他
+  - RULE-SET,Advertising,Advertising
+  - RULE-SET,Privacy_Domain,Advertising
+  - RULE-SET,Hijacking,Advertising
+  - RULE-SET,Netflix,Netflix
+  - RULE-SET,Disney,Disney+
+  - RULE-SET,HBO,HBO
+  - RULE-SET,YouTube,YouTube
+  - RULE-SET,Spotify,Spotify
+  - RULE-SET,TikTok,TikTok
+  - RULE-SET,GlobalMedia,GlobalMedia
+  - RULE-SET,BiliBili,Bilibili
+  - RULE-SET,Twitter,Twitter
+  - RULE-SET,Speedtest,Speedtest
+  - RULE-SET,PayPal,PayPal
+  - RULE-SET,Telegram,Telegram
+  - RULE-SET,TestFlight,TestFlight
+  - RULE-SET,Apple,Apple
+  - RULE-SET,Google,Google
+  - RULE-SET,Microsoft,Microsoft
+  - RULE-SET,Weibo,Weibo
+  - RULE-SET,China,Mainland
+  - RULE-SET,Claude,Claude
+  - RULE-SET,Google_Gemini,Gemini
+  - RULE-SET,OpenAI,OpenAI
+  - RULE-SET,Github,HK
+  - GEOIP,CN,DIRECT
+  - GEOIP,LAN,DIRECT
+  - MATCH,PROXY
